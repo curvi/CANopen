@@ -1,0 +1,77 @@
+==================================
+Hinweise zum Inhalt / Installation
+==================================
+
+Auf dem Datenträger befindet sich
+ - die Produktdokumentation des CMMP-AS M0 & M3,
+ - ein FCT-PlugIn zum CMMP-AS, CMMP-AS M0 und CMMP-AS M3,
+ - ein FCT-Projektkonverter,
+ - ein USB Treiber für den CMMP-AS M0 & M3,
+ - Feldbus-Support für PROFIBUS DP,
+ - Feldbus-Support für CanOpen,
+ - Feldbus-Support für DeviceNet,
+ - Feldbus-Support für EtherCAT
+ - Feldbus-Support für PROFINET
+ - Feldbus-Support für Ethernet/IP
+ - Festo Feldbus Profil FHPP
+ 
+
+----------------------------------------------------------------------
+
+Die Ordner-Struktur (mit <LW> = Laufwerksbuchstabe):
+
+<LW>:\Documentation\...		Dokumentation in mehreren Sprachen  
+	
+	\CanOpen			...zum Kommunikationsprofil CiA402 bei CANopen und EtherCAT
+	\CMMP-AS M0
+		\Hardware		...zum Grundgerät
+		\Software		...zur Funktionsbeschreibung
+		\STO			...zur STO Sicherheitsfunktion
+	\CMMP-AS M3			
+		\CAMC			...zur Montage der Technologiemodule und Beschreibung zum E/A Technologiemodul
+		\Hardware		...zum Grundgerät
+		\Replacement		...zum Austausch CMMP-AS gegen CMMP-AS M3 und Benutzung des Projektkonverter
+		\Software		...zur Funktionsbeschreibung
+		\STO			...zur STO Sicherheitsfunktion mit CAMC-G-S1 Interface
+	\FCT-Help			FCT Hilfedateien (Nur Englisch und Deutsch)	  
+	\FHPP				...zum Festo Handling und Positionierprofil und Feldbussen
+	
+<LW>:\FB-Tools\...		Feldbus-Support-Dateien
+ 
+	\CAN				EDS Dateien für CanOpen (DS402 und FHPP)
+	\DeviceNet\...
+		\Beckhoff		EDS Dateien für Beckhoff, Omron, Schneider, etc.
+		\Rockwell		EDS Dateien nur für Rockwell/Allen-Bradley
+	\EtherCAT			XML Datei
+	\Ethernet/IP			EDS Dateien für Ethernet/IP FHPP
+	\Profibus			GSD Datei und Bitmaps
+	\PROFINET			GSDML Datei und Bitmaps 
+
+<LW>:\Firmware\...             	Freigegebene Firmware Versionen
+
+<LW>:\License\...               Lizenzbestimmungen
+
+Die weiteren Ordner sind Teil der FCT-Installation und müssen vom
+Nutzer nicht beachtet werden.
+-----------------------------------------------------------------------
+Systemvoraussetzungen für die Installation des Festo Configuration Tool
+
+Hardware / PC
+ - Pentium IV Prozessor ab 2,00 GHz oder äquivalent
+ - 1 GB RAM (Arbeitsspeicher)
+ - 1 GB freier Speicherplatz auf der Festplatte
+ - CD-Rom zur Installation
+ - Bildschirmauflösung 1024 x 768
+
+Software
+ - Microsoft Windows XP ab SP3
+ - Microsoft Windows Vista ab SP2
+ - Microsoft Windows 7 ab SP1
+ - Internet Explorer ab V6.0
+
+Installation
+ - Starten Sie "Start.exe"
+ - Hinweis: zur Installation sind Administrator-Rechte erforderlich
+-----------------------------------------------------------------------
+
+Festo AG & Co. KG
