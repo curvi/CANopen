@@ -19,6 +19,8 @@
 #define EXT 0
 #define CS_PIN_DEFAULT 10
 #define CS_PIN_SOLDER_BRIDGE 9
+#define SUCCESS 1
+#define FAILURE 0
 
 
 // Service Data Object (SDO)
@@ -68,6 +70,22 @@ public:
   uint8_t write(\
       uint16_t index, uint8_t subIndex,\
       uint32_t data, uint16_t id=DEFAULT_NODE_ID);
+
+  uint8_t write8bit(\
+      uint16_t index, uint8_t subIndex,\
+      uint8_t data, uint16_t id=DEFAULT_NODE_ID) {
+    return write(index,subIndex,(uint8_t)data,id);
+  }
+  uint8_t write16bit(\
+      uint16_t index, uint8_t subIndex,\
+      uint8_t data, uint16_t id=DEFAULT_NODE_ID) {
+    return write(index,subIndex,(uint16_t)data,id);
+  }
+  uint8_t write32bit(\
+      uint16_t index, uint8_t subIndex,\
+      uint8_t data, uint16_t id=DEFAULT_NODE_ID) {
+    return write(index,subIndex,(uint32_t)data,id);
+  }
 
   uint8_t composeMsg(\
       uint8_t type_byte, uint16_t index,uint8_t subIndex);

@@ -44,9 +44,9 @@ uint8_t CANopen::read(\
   sendCanBuffer(id+SDO_COMMAND_ID_BASE,4);
   if (receiveCanMsg()==SDO_RESPONSE_READ_8BIT) {
     *data = can_receive_buffer[4]; // first data byte
-    return 0;
+    return SUCCESS;
   } else {
-    return 1; // requested data not received
+    return FAILURE; // requested data not received
   }
 }
 
@@ -59,9 +59,9 @@ uint8_t CANopen::read(\
     uint8_t* ptr = (uint8_t*)data;
     ptr[0] = can_receive_buffer[4];
     ptr[1] = can_receive_buffer[5];
-    return 0;
+    return SUCCESS;
   } else {
-    return 1; // requested data not received
+    return FAILURE; // requested data not received
   }
 }
 
@@ -76,26 +76,31 @@ uint8_t CANopen::read(\
     ptr[1] = can_receive_buffer[5];
     ptr[2] = can_receive_buffer[6];
     ptr[3] = can_receive_buffer[7];
-    return 0;
+    return SUCCESS;
   } else {
-    return 1; // requested data not received
+    return FAILURE; // requested data not received
   }
 }
 
 
+// 8 bit
 uint8_t CANopen::write(\
     uint16_t index, uint8_t subIndex,\
     uint8_t data, uint16_t id/*=DEFAULT_NODE_ID*/) {
   composeMsg(SDO_REQUEST_WRITE_8BIT,index,subIndex);
   can_msg_buffer[4] = data;
   sendCanBuffer(id+SDO_COMMAND_ID_BASE,5);
-  if (receiveCanMsg()==SDO_RESPONSE_WRITE) {
-    return 0; // success
+  if (receiveCanMsg()==SDO_RESPONSE_WRITE \
+      && can_receive_buffer[1]==(index&0xFF) \
+      && can_receive_buffer[2]==((index&0xFF00)>>8) \
+      && can_receive_buffer[3]==subIndex) {
+    return SUCCESS;
   } else {
-    return 1; // writing not terminated by other side
+    return FAILURE; // writing not terminated by other side
   }
 }
 
+// 16 bit
 uint8_t CANopen::write(\
     uint16_t index, uint8_t subIndex,\
     uint16_t data, uint16_t id/*=DEFAULT_NODE_ID*/) {
@@ -104,13 +109,17 @@ uint8_t CANopen::write(\
   can_msg_buffer[4] = ptr[0];
   can_msg_buffer[5] = ptr[1];
   sendCanBuffer(id+SDO_COMMAND_ID_BASE,6);
-  if (receiveCanMsg()==SDO_RESPONSE_WRITE) {
-    return 0; // success
+  if (receiveCanMsg()==SDO_RESPONSE_WRITE \
+      && can_receive_buffer[1]==(index&0xFF) \
+      && can_receive_buffer[2]==((index&0xFF00)>>8) \
+      && can_receive_buffer[3]==subIndex) {
+    return SUCCESS;
   } else {
-    return 1; // writing not terminated by other side
+    return FAILURE; // writing not terminated by other side
   }
 }
 
+// 32 bit
 uint8_t CANopen::write(\
     uint16_t index, uint8_t subIndex,\
     uint32_t data, uint16_t id/*=DEFAULT_NODE_ID*/) {
@@ -121,10 +130,13 @@ uint8_t CANopen::write(\
   can_msg_buffer[6] = ptr[2];
   can_msg_buffer[7] = ptr[3];
   sendCanBuffer(id+SDO_COMMAND_ID_BASE,8);
-  if (receiveCanMsg()==SDO_RESPONSE_WRITE) {
-    return 0; // success
+  if (receiveCanMsg()==SDO_RESPONSE_WRITE \
+      && can_receive_buffer[1]==(index&0xFF) \
+      && can_receive_buffer[2]==((index&0xFF00)>>8) \
+      && can_receive_buffer[3]==subIndex) {
+    return SUCCESS;
   } else {
-    return 1; // writing not terminated by other side
+    return FAILURE; // writing not terminated by other side
   }
 }
 
@@ -142,7 +154,7 @@ uint8_t CANopen::composeMsg(\
   can_msg_buffer[1] = ptr[0];
   can_msg_buffer[2] = ptr[1];
   can_msg_buffer[3] = subIndex;
-  return 0;
+  return SUCCESS;
 }
 
 
@@ -151,14 +163,14 @@ uint8_t CANopen::receiveCanMsg() {
   uint32_t startTime = millis();
   while(can_bus.checkReceive()!=CANBUS_NEW_MSG){
     if ((millis()-startTime)>CAN_RECEIVE_TIMEOUT_MS) {
-      return 1;
+      return FAILURE; // timed out
     }
   }
   uint8_t length;
   uint16_t id = can_bus.getCanId();
   while (can_bus.checkReceive()==CANBUS_NEW_MSG) {
     can_bus.readMsgBuf(&length,can_receive_buffer);
-#if 1
+#if 0
     Serial.print(F("rx: "));
     for(int i = 0; i<length; i++) {
       Serial.print(can_receive_buffer[i],HEX);
