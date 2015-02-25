@@ -8,29 +8,25 @@ uint8_t CANopen::can_receive_buffer[8] = {0};
 
 
 void CANopen::setup() {
-  Serial.println("Can setting up");
+  Serial.println(F("Can setting up"));
 
   uint8_t init_bool = 0;
   do {
     init_bool = can_bus.begin(CAN_100KBPS);
     if (init_bool==CAN_OK) {
-      Serial.print("CAN init ok!!\r\n");
+      Serial.print(F("CAN init ok!!\r\n"));
     } else {
-      Serial.print("CAN init failed!!\r\n");
+      Serial.print(F("CAN init failed!!\r\n"));
     }
     delay(100);
   } while (init_bool!=CAN_OK);
   // set masks to check all ID bits
-  // can_bus.init_Mask(0,0,0x7FF);
-  // can_bus.init_Mask(1,0,0x7FF);
+  // can_bus.init_Mask(0,0,0x7FF); can_bus.init_Mask(1,0,0x7FF);
 
   // can_bus.init_Filt(0,0,0x581);
-  // can_bus.init_Filt(1,0,0x7FF);
-  // can_bus.init_Filt(2,0,0x481);
-  // can_bus.init_Filt(2,0,0x381);
-  // can_bus.init_Filt(3,0,0x7FF); // off
-  // can_bus.init_Filt(4,0,0x7FF);
-  // can_bus.init_Filt(5,0,0x7FF);
+  // can_bus.init_Filt(1,0,0x7FF); can_bus.init_Filt(2,0,0x481);
+  // can_bus.init_Filt(2,0,0x381); can_bus.init_Filt(3,0,0x7FF); // off
+  // can_bus.init_Filt(4,0,0x7FF); can_bus.init_Filt(5,0,0x7FF);
   delay(10);
   Serial.println(F("Can setup complete"));
   return;
@@ -56,10 +52,10 @@ uint8_t CANopen::read(\
       return FAILURE;
   }
   for (uint8_t i=0; i<4; i++) {
-    if (i<=len) {
-      ptr[4-len+i] = can_receive_buffer[4+i]; // first data byte
+    if (i<len) {
+      ptr[i] = can_receive_buffer[4+i]; // fill data bytes
     } else {
-      ptr[3-i] = 0;
+      ptr[i] = 0x00; // fill the other bytes with 0
     }
   }
   return SUCCESS;
@@ -184,7 +180,7 @@ uint8_t CANopen::composeMsg(\
 
 
 uint8_t CANopen::receiveCanMsg() {
-  //Wait for message
+  // wait for message
   uint32_t startTime = millis();
   while(can_bus.checkReceive()!=CANBUS_NEW_MSG){
     if ((millis()-startTime)>CAN_RECEIVE_TIMEOUT_MS) {
@@ -195,13 +191,12 @@ uint8_t CANopen::receiveCanMsg() {
   uint16_t id = can_bus.getCanId();
   while (can_bus.checkReceive()==CANBUS_NEW_MSG) {
     can_bus.readMsgBuf(&length,can_receive_buffer);
-#if 0
-    Serial.print(F("rx: "));
-    for(int i = 0; i<length; i++) {
-      Serial.print(can_receive_buffer[i],HEX);
-      Serial.print(" ");
-    }
+#ifdef DEBUG // read out all received messages
+    Serial.print(F("Id: "));Serial.println(id,HEX);
+    Serial.print(F("data: ")); for(int i = 0; i<length; i++) {
+      Serial.print(can_receive_buffer[i],HEX); Serial.print(" "); }
 #endif
+
     // check the type bit, which kind of response it is
     switch (can_receive_buffer[0]) {
       // requested readings for 8,16,32 bit data
@@ -214,12 +209,21 @@ uint8_t CANopen::receiveCanMsg() {
       // confirmation of successful write
       case SDO_RESPONSE_WRITE:
         return SDO_RESPONSE_WRITE;
-      case SDO_ERROR_CODE:
-        // TODO if is = 80 + node id: ERROR!!
-        // Read out the error
-        return 99; // an error occurred!
+      case SDO_ERROR_CODE: // fall through error
+      case SDO_ERROR_CODE+DEFAULT_NODE_ID:
+        Serial.println(F("\nERROR"));
+        Serial.print(F("Error Message is: "));
+        for (uint8_t i=0; i<length; i++) {
+          Serial.print(can_receive_buffer[i],HEX);
+        }
+        break;
       case 0:
         // TODO if PDO message: ACT!,
+        Serial.println(F("\nPDO Msg received"));
+        Serial.print(F("Message is: "));
+        for (uint8_t i=0; i<length; i++) {
+          Serial.print(can_receive_buffer[i],HEX);
+        }
         break; // maybe another msg is waiting
       default:
         break;
@@ -249,4 +253,24 @@ uint8_t CANopen::sendSyncMsg(uint8_t id/*=DEFAULT_NODE_ID*/) {
   can_msg_buffer[0] = 0x00;
   can_msg_buffer[1] = id;
   sendCanBuffer(0x0000,2);
+}
+
+
+uint8_t CANopen::readCanBus() {
+  // wait for message
+  uint32_t startTime = millis();
+  while(can_bus.checkReceive()!=CANBUS_NEW_MSG){
+    if ((millis()-startTime)>CAN_RECEIVE_TIMEOUT_MS) {
+      return FAILURE; // timed out
+    }
+  }
+  uint8_t length;
+  uint16_t id = can_bus.getCanId();
+  while (can_bus.checkReceive()==CANBUS_NEW_MSG) {
+    can_bus.readMsgBuf(&length,can_receive_buffer);
+    Serial.print(F("Id: "));Serial.println(id,HEX);
+    Serial.print(F("data: ")); for(int i = 0; i<length; i++) {
+      Serial.print(can_receive_buffer[i],HEX); Serial.print(" "); }
+  }
+  return SUCCESS;
 }

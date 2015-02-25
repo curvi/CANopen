@@ -10,6 +10,9 @@
 // #include <SPI.h>     // SPI interface with CAN shield
 
 
+// read out every msg received
+#define DEBUG
+
 #define DEFAULT_NODE_ID 0x0001
 #define CAN_RECEIVE_TIMEOUT_MS 100
 
@@ -85,12 +88,12 @@ public:
   uint8_t resetNode(uint8_t id=DEFAULT_NODE_ID);
   uint8_t sendSyncMsg(uint8_t id=DEFAULT_NODE_ID);
 
+  uint8_t readCanBus();
 
 private:
   static MCP_CAN can_bus;
   static uint8_t can_msg_buffer[8];
   static uint8_t can_receive_buffer[8];
-
 };
 
 
