@@ -39,6 +39,34 @@ void CANopen::setup() {
 
 uint8_t CANopen::read(\
     uint16_t index, uint8_t subIndex,\
+    uint32_t* data, uint16_t id/*=DEFAULT_NODE_ID*/) {
+  composeMsg(SDO_REQUEST_READ,index,subIndex);
+  sendCanBuffer(id+SDO_COMMAND_ID_BASE,4);
+  uint8_t* ptr = (uint8_t*)data;
+  uint8_t len = 0;
+  switch (receiveCanMsg()) {
+    // requested readings for 8 or 16 or 32 bit data
+    case SDO_RESPONSE_READ_8BIT:
+      len = 1; break;
+    case SDO_RESPONSE_READ_16BIT:
+      len = 2; break;
+    case SDO_RESPONSE_READ_32BIT:
+      len = 4; break;
+    default:
+      return FAILURE;
+  }
+  for (uint8_t i=0; i<4; i++) {
+    if (i<=len) {
+      ptr[4-len+i] = can_receive_buffer[4+i]; // first data byte
+    } else {
+      ptr[3-i] = 0;
+    }
+  }
+  return SUCCESS;
+}
+
+uint8_t CANopen::read8bit(\
+    uint16_t index, uint8_t subIndex,\
     uint8_t* data, uint16_t id/*=DEFAULT_NODE_ID*/) {
   composeMsg(SDO_REQUEST_READ,index,subIndex);
   sendCanBuffer(id+SDO_COMMAND_ID_BASE,4);
@@ -50,7 +78,7 @@ uint8_t CANopen::read(\
   }
 }
 
-uint8_t CANopen::read(\
+uint8_t CANopen::read16bit(\
     uint16_t index, uint8_t subIndex,\
     uint16_t* data, uint16_t id/*=DEFAULT_NODE_ID*/) {
   composeMsg(SDO_REQUEST_READ,index,subIndex);
@@ -65,7 +93,7 @@ uint8_t CANopen::read(\
   }
 }
 
-uint8_t CANopen::read(\
+uint8_t CANopen::read32bit(\
     uint16_t index, uint8_t subIndex,\
     uint32_t* data, uint16_t id/*=DEFAULT_NODE_ID*/) {
   composeMsg(SDO_REQUEST_READ,index,subIndex);
@@ -83,8 +111,7 @@ uint8_t CANopen::read(\
 }
 
 
-// 8 bit
-uint8_t CANopen::write(\
+uint8_t CANopen::write8bit(\
     uint16_t index, uint8_t subIndex,\
     uint8_t data, uint16_t id/*=DEFAULT_NODE_ID*/) {
   composeMsg(SDO_REQUEST_WRITE_8BIT,index,subIndex);
@@ -100,8 +127,7 @@ uint8_t CANopen::write(\
   }
 }
 
-// 16 bit
-uint8_t CANopen::write(\
+uint8_t CANopen::write16bit(\
     uint16_t index, uint8_t subIndex,\
     uint16_t data, uint16_t id/*=DEFAULT_NODE_ID*/) {
   composeMsg(SDO_REQUEST_WRITE_16BIT,index,subIndex);
@@ -119,8 +145,7 @@ uint8_t CANopen::write(\
   }
 }
 
-// 32 bit
-uint8_t CANopen::write(\
+uint8_t CANopen::write32bit(\
     uint16_t index, uint8_t subIndex,\
     uint32_t data, uint16_t id/*=DEFAULT_NODE_ID*/) {
   composeMsg(SDO_REQUEST_WRITE_32BIT,index,subIndex);
@@ -191,6 +216,7 @@ uint8_t CANopen::receiveCanMsg() {
         return SDO_RESPONSE_WRITE;
       case SDO_ERROR_CODE:
         // TODO if is = 80 + node id: ERROR!!
+        // Read out the error
         return 99; // an error occurred!
       case 0:
         // TODO if PDO message: ACT!,

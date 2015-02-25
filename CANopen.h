@@ -53,39 +53,27 @@ public:
 
   uint8_t read(\
       uint16_t index, uint8_t subIndex,\
+      uint32_t* data, uint16_t id=DEFAULT_NODE_ID);
+  uint8_t read8bit(\
+      uint16_t index, uint8_t subIndex,\
       uint8_t* data, uint16_t id=DEFAULT_NODE_ID);
-  uint8_t read(\
+  uint8_t read16bit(\
       uint16_t index, uint8_t subIndex,\
       uint16_t* data, uint16_t id=DEFAULT_NODE_ID);
-  uint8_t read(\
+  uint8_t read32bit(\
       uint16_t index, uint8_t subIndex,\
       uint32_t* data, uint16_t id=DEFAULT_NODE_ID);
 
-  uint8_t write(\
+  uint8_t write8bit(\
       uint16_t index, uint8_t subIndex,\
       uint8_t data, uint16_t id=DEFAULT_NODE_ID);
-  uint8_t write(\
+  uint8_t write16bit(\
       uint16_t index, uint8_t subIndex,\
       uint16_t data, uint16_t id=DEFAULT_NODE_ID);
-  uint8_t write(\
+  uint8_t write32bit(\
       uint16_t index, uint8_t subIndex,\
       uint32_t data, uint16_t id=DEFAULT_NODE_ID);
 
-  uint8_t write8bit(\
-      uint16_t index, uint8_t subIndex,\
-      uint8_t data, uint16_t id=DEFAULT_NODE_ID) {
-    return write(index,subIndex,(uint8_t)data,id);
-  }
-  uint8_t write16bit(\
-      uint16_t index, uint8_t subIndex,\
-      uint8_t data, uint16_t id=DEFAULT_NODE_ID) {
-    return write(index,subIndex,(uint16_t)data,id);
-  }
-  uint8_t write32bit(\
-      uint16_t index, uint8_t subIndex,\
-      uint8_t data, uint16_t id=DEFAULT_NODE_ID) {
-    return write(index,subIndex,(uint32_t)data,id);
-  }
 
   uint8_t composeMsg(\
       uint8_t type_byte, uint16_t index,uint8_t subIndex);
