@@ -35,6 +35,7 @@
 
 #define SDO_ERROR_CODE 0x80
 
+#define MODE_POSITION 1
 
 class MotorCtrl
 {
@@ -48,6 +49,7 @@ public:
   static CANopen can;
 
 private:
+  static uint16_t controlWord;
   // static MCP_CAN can_bus;
   // static uint8_t can_msg_buffer[8];
   // static uint8_t can_receive_buffer[8];

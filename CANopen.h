@@ -83,7 +83,7 @@ public:
   uint8_t receiveCanMsg();
   uint8_t sendCanBuffer(uint16_t id, uint8_t length);
 
-  // special message functions
+  // NMT Messages: special message functions
   uint8_t startOperational(uint8_t id=DEFAULT_NODE_ID);
   uint8_t resetNode(uint8_t id=DEFAULT_NODE_ID);
   uint8_t sendSyncMsg(uint8_t id=DEFAULT_NODE_ID);
@@ -94,6 +94,8 @@ private:
   static MCP_CAN can_bus;
   static uint8_t can_msg_buffer[8];
   static uint8_t can_receive_buffer[8];
+  static uint16_t canId;
+
 };
 
 

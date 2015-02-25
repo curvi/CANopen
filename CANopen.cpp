@@ -4,6 +4,7 @@
 MCP_CAN CANopen::can_bus = MCP_CAN(CS_PIN_DEFAULT);
 uint8_t CANopen::can_msg_buffer[8] = {0};
 uint8_t CANopen::can_receive_buffer[8] = {0};
+uint16_t CANopen::canId = 0;
 
 
 
@@ -188,7 +189,7 @@ uint8_t CANopen::receiveCanMsg() {
     }
   }
   uint8_t length;
-  uint16_t id = can_bus.getCanId();
+  canId = can_bus.getCanId();
   while (can_bus.checkReceive()==CANBUS_NEW_MSG) {
     can_bus.readMsgBuf(&length,can_receive_buffer);
 #ifdef DEBUG // read out all received messages
@@ -231,31 +232,6 @@ uint8_t CANopen::receiveCanMsg() {
   } // while msg received
 }
 
-
-uint8_t CANopen::startOperational(uint8_t id/*=DEFAULT_NODE_ID*/) {
-  //CAN open message to change from pre-operational state to operational
-  can_msg_buffer[0] = 0x01;
-  can_msg_buffer[1] = id;
-  sendCanBuffer(0x0000,2);
-}
-
-
-uint8_t CANopen::resetNode(uint8_t id/*=DEFAULT_NODE_ID*/) {
-  //CAN open message to reset the App on the node
-  can_msg_buffer[0] = 0x81;
-  can_msg_buffer[1] = id;
-  sendCanBuffer(0x0000,2);
-}
-
-
-uint8_t CANopen::sendSyncMsg(uint8_t id/*=DEFAULT_NODE_ID*/) {
-  //CAN sync message, after which CANopen devices will respond synchronous,CAN busload can be controlled by Master, in this case its Arduino.
-  can_msg_buffer[0] = 0x00;
-  can_msg_buffer[1] = id;
-  sendCanBuffer(0x0000,2);
-}
-
-
 uint8_t CANopen::readCanBus() {
   // wait for message
   uint32_t startTime = millis();
@@ -265,7 +241,7 @@ uint8_t CANopen::readCanBus() {
     }
   }
   uint8_t length;
-  uint16_t id = can_bus.getCanId();
+  canId = can_bus.getCanId();
   while (can_bus.checkReceive()==CANBUS_NEW_MSG) {
     can_bus.readMsgBuf(&length,can_receive_buffer);
     Serial.print(F("Id: "));Serial.println(id,HEX);
@@ -274,3 +250,30 @@ uint8_t CANopen::readCanBus() {
   }
   return SUCCESS;
 }
+
+
+uint8_t CANopen::startOperational(uint8_t id/*=DEFAULT_NODE_ID*/) {
+  //CAN open message to change from pre-operational state to operational
+  can_msg_buffer[0] = 0x01; // NMT Msg
+  can_msg_buffer[1] = id;
+  sendCanBuffer(0x0000,2);
+  while (readCanBus!=SUCCESS){}; // wait for termination
+}
+
+
+uint8_t CANopen::resetNode(uint8_t id/*=DEFAULT_NODE_ID*/) {
+  //CAN open message to reset the App on the node
+  can_msg_buffer[0] = 0x81; // NMT Msg
+  can_msg_buffer[1] = id;
+  sendCanBuffer(0x0000,2);
+  while (readCanBus!=SUCCESS){}; // wait for termination
+}
+
+uint8_t CANopen::sendSyncMsg(uint8_t id/*=DEFAULT_NODE_ID*/) {
+  //CAN sync message, after which CANopen devices will respond synchronous,CAN busload can be controlled by Master, in this case its Arduino.
+  can_msg_buffer[0] = 0x00; // NMT Msg
+  can_msg_buffer[1] = id;
+  sendCanBuffer(0x0000,2);
+  while (readCanBus!=SUCCESS){}; // wait for termination
+}
+
