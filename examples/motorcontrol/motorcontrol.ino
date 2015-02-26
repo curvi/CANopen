@@ -18,16 +18,17 @@ void setup() {
   Serial.begin(115200);
 
   motorctrl.setup();
-  motorctrl.startController();
-  motorctrl.applySettings();
+
+  // enableOperation(); // motor active
+
+  newSetpoint(pos,vel);
+
+  // activateNewSetpoint();
 
   delay(100);
 }
 
 
 void loop() {
-
-
-  
   delay(50);
 }
