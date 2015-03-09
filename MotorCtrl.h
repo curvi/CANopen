@@ -1,6 +1,16 @@
 #ifndef MOTORCTRL_H
 #define MOTORCTRL_H
 
+// Digital In and Outputs of the controller:
+// DIN 0..3 all LOW permanently
+// DIN 4,5 controllable from Arduino
+// DIN 6,7 Terminal switches (magnet switch)
+// DIN 8 HIGH
+// DIN 9 LOW
+// DIN 10,11 not connected
+// DIN 12,13 LOW
+// DOUT 0,1 readable by Arduino
+
 
 #include <Arduino.h>
 // make sure DEBUG_MODE = 0 in mcp_can_dfs.h line 35
