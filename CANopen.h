@@ -90,11 +90,11 @@ public:
 
   uint8_t readCanBus();
 
+  static uint16_t canId;
 private:
   static MCP_CAN can_bus;
   static uint8_t can_msg_buffer[8];
   static uint8_t can_receive_buffer[8];
-  static uint16_t canId;
 
 };
 

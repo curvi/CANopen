@@ -193,9 +193,9 @@ uint8_t CANopen::receiveCanMsg() {
   while (can_bus.checkReceive()==CANBUS_NEW_MSG) {
     can_bus.readMsgBuf(&length,can_receive_buffer);
 #ifdef DEBUG // read out all received messages
-    Serial.print(F("Id: "));Serial.println(id,HEX);
+    Serial.print(F("Id: "));Serial.println(canId,HEX);
     Serial.print(F("data: ")); for(int i = 0; i<length; i++) {
-      Serial.print(can_receive_buffer[i],HEX); Serial.print(" "); }
+    Serial.print(can_receive_buffer[i],HEX); Serial.print(" "); }
 #endif
 
     // check the type bit, which kind of response it is
@@ -244,7 +244,7 @@ uint8_t CANopen::readCanBus() {
   canId = can_bus.getCanId();
   while (can_bus.checkReceive()==CANBUS_NEW_MSG) {
     can_bus.readMsgBuf(&length,can_receive_buffer);
-    Serial.print(F("Id: "));Serial.println(id,HEX);
+    Serial.print(F("Id: "));Serial.println(canId,HEX);
     Serial.print(F("data: ")); for(int i = 0; i<length; i++) {
       Serial.print(can_receive_buffer[i],HEX); Serial.print(" "); }
   }
@@ -257,7 +257,9 @@ uint8_t CANopen::startOperational(uint8_t id/*=DEFAULT_NODE_ID*/) {
   can_msg_buffer[0] = 0x01; // NMT Msg
   can_msg_buffer[1] = id;
   sendCanBuffer(0x0000,2);
-  while (readCanBus!=SUCCESS){}; // wait for termination
+  while (readCanBus()!=SUCCESS)
+  {Serial.println(F("waiting startOperational"));};
+  return SUCCESS;
 }
 
 
@@ -266,7 +268,9 @@ uint8_t CANopen::resetNode(uint8_t id/*=DEFAULT_NODE_ID*/) {
   can_msg_buffer[0] = 0x81; // NMT Msg
   can_msg_buffer[1] = id;
   sendCanBuffer(0x0000,2);
-  while (readCanBus!=SUCCESS){}; // wait for termination
+  while (readCanBus()!=SUCCESS)
+  {Serial.println(F("waiting resetNode"));};
+  return SUCCESS;
 }
 
 uint8_t CANopen::sendSyncMsg(uint8_t id/*=DEFAULT_NODE_ID*/) {
@@ -274,6 +278,8 @@ uint8_t CANopen::sendSyncMsg(uint8_t id/*=DEFAULT_NODE_ID*/) {
   can_msg_buffer[0] = 0x00; // NMT Msg
   can_msg_buffer[1] = id;
   sendCanBuffer(0x0000,2);
-  while (readCanBus!=SUCCESS){}; // wait for termination
+  while (readCanBus()!=SUCCESS)
+  {Serial.println(F("waiting sendSyncMsg"));};
+  return SUCCESS;
 }
 

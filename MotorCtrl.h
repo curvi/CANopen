@@ -6,11 +6,12 @@
 // make sure DEBUG_MODE = 0 in mcp_can_dfs.h line 35
 #include "CANopen.h"
 
-
-#define PIN_DIN_8 5
+#define DEBUG
 
 #define PIN_DIN_4 7
 #define PIN_DIN_5 6
+#define IN_CONTROL_ACITVATE PIN_DIN_5
+#define IN_MOTOR_ACTIVATE PIN_DIN_4
 #define PIN_DO_0 4
 #define PIN_DO_1 5
 
