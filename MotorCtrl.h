@@ -9,6 +9,11 @@
 
 #define PIN_DIN_8 5
 
+#define PIN_DIN_4 7
+#define PIN_DIN_5 6
+#define PIN_DO_0 4
+#define PIN_DO_1 5
+
 #define SUCCESS 1
 #define FAILURE 0
 

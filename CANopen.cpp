@@ -13,7 +13,7 @@ void CANopen::setup() {
 
   uint8_t init_bool = 0;
   do {
-    init_bool = can_bus.begin(CAN_100KBPS);
+    init_bool = can_bus.begin(CAN_125KBPS);
     if (init_bool==CAN_OK) {
       Serial.print(F("CAN init ok!!\r\n"));
     } else {
